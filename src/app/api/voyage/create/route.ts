@@ -1,4 +1,5 @@
-import type { NextApiHandler, NextApiResponse, NextApiRequest } from "next";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "~/server/db";
 
 /**
@@ -53,40 +54,71 @@ import { prisma } from "~/server/db";
  *       405:
  *         description: Method not allowed, indicates that the request method is not supported by the endpoint.
  */
-const handler: NextApiHandler = async (
-  req: NextApiRequest,
-  res: NextApiResponse<undefined>,
-) => {
-  if (req.method === "POST") {
-    if (req.method === "POST") {
-      const {
-        departure,
-        arrival,
-        portOfLoading,
-        portOfDischarge,
-        vessel,
-        unitTypes,
-      } = req.body;
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
 
-      const createdVoyage = await prisma.voyage.create({
-        data: {
-          scheduledDeparture: departure,
-          scheduledArrival: arrival,
-          portOfLoading,
-          portOfDischarge,
-          vesselId: vessel,
-          unitTypes: {
-            connect: unitTypes.map((id: string) => ({ id })),
-          },
-        },
-      });
+    const {
+      departure,
+      arrival,
+      portOfLoading,
+      portOfDischarge,
+      vessel,
+      unitTypes,
+    } = body;
 
-      createdVoyage ? res.status(201) : res.status(500);
-      res.end();
-      return;
+    if (
+      !departure ||
+      !arrival ||
+      !portOfLoading ||
+      !portOfDischarge ||
+      !vessel ||
+      !unitTypes
+    ) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 },
+      );
     }
 
-    res.status(405).end();
+    const createdVoyage = await prisma.voyage.create({
+      data: {
+        scheduledDeparture: departure,
+        scheduledArrival: arrival,
+        portOfLoading,
+        portOfDischarge,
+        vesselId: vessel,
+        unitTypes: {
+          connect: unitTypes.map((id: string) => ({ id })),
+        },
+      },
+    });
+
+    if (createdVoyage) {
+      return NextResponse.json(
+        { message: "Voyage created successfully" },
+        { status: 201 },
+      );
+    } else {
+      return NextResponse.json(
+        { error: "Failed to create voyage" },
+        { status: 500 },
+      );
+    }
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
-};
-export default handler;
+}
+
+export function OPTIONS() {
+  return NextResponse.json(null, {
+    status: 204,
+    headers: {
+      Allow: "POST, OPTIONS",
+    },
+  });
+}

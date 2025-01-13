@@ -1,10 +1,5 @@
-import type { Vessel, Voyage, UnitType } from "@prisma/client";
-import type { NextApiHandler, NextApiResponse } from "next";
+import { NextResponse } from "next/server";
 import { prisma } from "~/server/db";
-
-export type ReturnType = (Voyage & { vessel: Vessel } & {
-  unitTypes: UnitType[];
-})[];
 
 /**
  * @swagger
@@ -75,15 +70,31 @@ export type ReturnType = (Voyage & { vessel: Vessel } & {
  *                           type: string
  *                           format: date-time
  */
-const handler: NextApiHandler = async (_, res: NextApiResponse<ReturnType>) => {
-  const voyages = await prisma.voyage.findMany({
-    include: {
-      vessel: {},
-      unitTypes: {},
+
+export async function GET() {
+  try {
+    const voyages = await prisma.voyage.findMany({
+      include: {
+        vessel: true,
+        unitTypes: true,
+      },
+    });
+
+    return NextResponse.json(voyages, { status: 200 });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
+  }
+}
+
+export function OPTIONS() {
+  return NextResponse.json(null, {
+    status: 204,
+    headers: {
+      Allow: "GET, OPTIONS",
     },
   });
-
-  res.status(200).json(voyages);
-};
-
-export default handler;
+}

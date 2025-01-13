@@ -1,8 +1,6 @@
-import type { Vessel, Voyage } from "@prisma/client";
-import type { NextApiHandler, NextApiResponse, NextApiRequest } from "next";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { prisma } from "~/server/db";
-
-export type ReturnType = (Voyage & { vessel: Vessel })[];
 
 /**
  * @swagger
@@ -29,29 +27,50 @@ export type ReturnType = (Voyage & { vessel: Vessel })[];
  *       405:
  *         description: Method Not Allowed. Only DELETE method is supported on this endpoint.
  */
-const handler: NextApiHandler = async (
-  req: NextApiRequest,
-  res: NextApiResponse<undefined>,
-) => {
-  if (req.method === "DELETE") {
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
+  const { id } = params;
+
+  if (!id) {
+    return NextResponse.json({ error: "ID is required" }, { status: 400 });
+  }
+
+  try {
     // randomly fail the delete request
     const maybe = Math.round(Math.random());
     if (maybe) {
-      res.status(400).end();
-      return;
+      return NextResponse.json(
+        { error: "Random failure occurred" },
+        { status: 400 },
+      );
     }
+
     const deletedVoyage = await prisma.voyage.delete({
-      where: {
-        id: req.query.id as string,
-      },
+      where: { id },
     });
 
-    deletedVoyage ? res.status(204) : res.status(404);
-    res.end();
-    return;
+    if (deletedVoyage) {
+      return NextResponse.json(null, { status: 204 });
+    } else {
+      return NextResponse.json({ error: "Voyage not found" }, { status: 404 });
+    }
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
+}
 
-  res.status(405).end();
-};
-
-export default handler;
+export function OPTIONS() {
+  return NextResponse.json(null, {
+    status: 204,
+    headers: {
+      Allow: "DELETE, OPTIONS",
+    },
+  });
+}

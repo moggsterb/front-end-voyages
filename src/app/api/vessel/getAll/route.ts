@@ -1,13 +1,13 @@
-import type { NextApiHandler, NextApiResponse } from "next";
+import { NextResponse } from "next/server";
 import { prisma } from "~/server/db";
 
 // Assuming the type for a single vessel object.
 type Vessel = {
-    id: string; // or number, depending on your database schema
-    name: string;
-  };
+  id: string; // or number, depending on your database schema
+  name: string;
+};
 
-export type VesselsType = ({ value: string, label: string })[];
+export type VesselsType = { value: string; label: string }[];
 
 /**
  * @swagger
@@ -36,11 +36,30 @@ export type VesselsType = ({ value: string, label: string })[];
  *       500:
  *         description: Internal Server Error - if there's an issue fetching the vessels.
  */
-const handler: NextApiHandler = async (_, res: NextApiResponse<VesselsType>) => {
-    const allVessel: Vessel[] = await prisma.vessel.findMany();
-    const vessels = allVessel.map(vessel => ({ label: vessel.name, value: vessel.id }))
 
-    res.status(200).json(vessels);
-};
+export async function GET() {
+  try {
+    const allVessels: Vessel[] = await prisma.vessel.findMany();
+    const vessels = allVessels.map((vessel) => ({
+      label: vessel.name,
+      value: vessel.id,
+    }));
 
-export default handler;
+    return NextResponse.json(vessels, { status: 200 });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
+  }
+}
+
+export function OPTIONS() {
+  return NextResponse.json(null, {
+    status: 204,
+    headers: {
+      Allow: "GET, OPTIONS",
+    },
+  });
+}
