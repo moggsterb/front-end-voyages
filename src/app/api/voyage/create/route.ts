@@ -75,10 +75,10 @@ export async function POST(request: NextRequest) {
       !vessel ||
       !unitTypes
     ) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 },
-      );
+      return NextResponse.json({
+        error: "Missing required fields",
+        status: 400,
+      });
     }
 
     const createdVoyage = await prisma.voyage.create({
@@ -95,22 +95,19 @@ export async function POST(request: NextRequest) {
     });
 
     if (createdVoyage) {
-      return NextResponse.json(
-        { message: "Voyage created successfully" },
-        { status: 201 },
-      );
+      return NextResponse.json({
+        message: "Voyage created successfully",
+        status: 201,
+      });
     } else {
-      return NextResponse.json(
-        { error: "Failed to create voyage" },
-        { status: 500 },
-      );
+      return NextResponse.json({
+        error: "Failed to create voyage",
+        status: 500,
+      });
     }
   } catch (error) {
     console.error(error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error", status: 500 });
   }
 }
 

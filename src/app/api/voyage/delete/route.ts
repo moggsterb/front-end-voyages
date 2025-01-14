@@ -28,17 +28,14 @@ import { prisma } from "~/server/db";
  *         description: Method Not Allowed. Only DELETE method is supported on this endpoint.
  */
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } },
-) {
-  const { id } = params;
-
-  if (!id) {
-    return NextResponse.json({ error: "ID is required" }, { status: 400 });
-  }
-
+export const DELETE = async (req: NextRequest) => {
   try {
+    const id = req.nextUrl.searchParams.get("id");
+    console.log("id", id);
+    if (!id) {
+      return NextResponse.json({ error: "ID is required" }, { status: 400 });
+    }
+
     // randomly fail the delete request
     const maybe = Math.round(Math.random());
     if (maybe) {
@@ -53,9 +50,12 @@ export async function DELETE(
     });
 
     if (deletedVoyage) {
-      return NextResponse.json(null, { status: 204 });
+      return NextResponse.json({
+        success: true,
+        status: 204,
+      });
     } else {
-      return NextResponse.json({ error: "Voyage not found" }, { status: 404 });
+      return NextResponse.json({ error: "Voyage not found", status: 404 });
     }
   } catch (error) {
     console.error(error);
@@ -64,7 +64,7 @@ export async function DELETE(
       { status: 500 },
     );
   }
-}
+};
 
 export function OPTIONS() {
   return NextResponse.json(null, {

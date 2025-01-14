@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "~/server/db";
+import type { Prisma } from "@prisma/client";
 
 // Assuming the type for a single vessel object.
-type Vessel = {
-  id: string; // or number, depending on your database schema
-  name: string;
-};
+type Vessel = Prisma.VesselGetPayload<Record<string, never>>;
 
-export type VesselsType = { value: string; label: string }[];
+//export type VesselsType = { value: string; label: string }[];
+
+export type VesselsType = [Vessel];
 
 /**
  * @swagger
@@ -48,10 +48,7 @@ export async function GET() {
     return NextResponse.json(vessels, { status: 200 });
   } catch (error) {
     console.error(error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error", status: 500 });
   }
 }
 

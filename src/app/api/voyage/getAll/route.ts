@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "~/server/db";
+import type { Prisma } from "@prisma/client";
 
 /**
  * @swagger
@@ -71,6 +72,15 @@ import { prisma } from "~/server/db";
  *                           format: date-time
  */
 
+export type ReturnType = [
+  Prisma.VoyageGetPayload<{
+    include: {
+      vessel: true;
+      unitTypes: true;
+    };
+  }>,
+];
+
 export async function GET() {
   try {
     const voyages = await prisma.voyage.findMany({
@@ -83,10 +93,7 @@ export async function GET() {
     return NextResponse.json(voyages, { status: 200 });
   } catch (error) {
     console.error(error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error", status: 500 });
   }
 }
 
