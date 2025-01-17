@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { fetchData } from "~/utils";
+import { fetchData } from "~/lib/utils";
 import type { ReturnType } from "../app/api/voyage/getAll/route";
 import { Button } from "~/components/ui/button";
 import { TABLE_DATE_FORMAT } from "~/constants";
