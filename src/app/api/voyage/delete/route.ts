@@ -29,6 +29,7 @@ import { prisma } from "~/server/db";
  */
 
 export const DELETE = async (req: NextRequest) => {
+  console.log("Going for a DELETE");
   try {
     const id = req.nextUrl.searchParams.get("id");
     console.log("id", id);
@@ -37,13 +38,13 @@ export const DELETE = async (req: NextRequest) => {
     }
 
     // randomly fail the delete request
-    const maybe = Math.round(Math.random());
-    if (maybe) {
-      return NextResponse.json(
-        { error: "Random failure occurred" },
-        { status: 400 },
-      );
-    }
+    // const maybe = Math.round(Math.random());
+    // if (true) {
+    //   return NextResponse.json(
+    //     { error: "Random failure occurred" },
+    //     { status: 400 },
+    //   );
+    // }
 
     const deletedVoyage = await prisma.voyage.delete({
       where: { id },
