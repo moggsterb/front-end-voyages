@@ -1,5 +1,23 @@
 # Frontend Code Challenge
 
+## Michael's Notes
+
+I've completed all the tasks.
+
+I'm newish to Tanstack Query so that was a bit of a learning curve.
+
+I've moved the fetches/mutations into server actions with absolute fetches. I've tried to treat the API as an external service and hence only access it from the server.
+
+I've added an extra var to the env file `API_URL` to allow this.
+
+I chose to use `react-hook-form` and `zod`. I've not used these before but I've used `Formik`/`Yup`.
+
+I've created a `ui-extra` folder to avoid confusion with native shadcn components. I've added a combined date/time picker component (using shadcn's Calendar) and a checkbox group component for use with the unitTypes selection.
+
+Michael
+
+---
+
 The task of this code challenge is to add the functionality described below to this existing sample application: [https://github.com/dfds-frontend/frontend-dev-challenge](https://github.com/dfds-frontend/frontend-dev-challenge). Clone this project to get started.
 
 The application is built using NextJS, TypeScript, Prisma, React Query, Tailwind, Zod, and [https://ui.shadcn.com/](https://ui.shadcn.com/) for ready-made components. It is expected that you will complete the tasks below using these technologies.
